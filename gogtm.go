@@ -244,7 +244,7 @@ func Stop() (error){
 
 
 
-//Kill deletes global variable and its descendant nodes
+//Kill deletes global variable without its descendant nodes
 func Kill(global string) (error){
 
   if len(global) < 2 {
