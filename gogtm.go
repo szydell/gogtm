@@ -242,9 +242,7 @@ func Stop() (error){
   return nil
 } // end of Stop
 
-
-
-//Kill deletes global variable without its descendant nodes
+//Kill deletes global variable and its descendant nodes
 func Kill(global string) (error){
 
   if len(global) < 2 {
@@ -267,7 +265,7 @@ func Kill(global string) (error){
   return nil
 }  // end of Kill
 
-//Kill deletes global variable and its descendant nodes
+//ZKill deletes global variable without its descendant nodes
 func ZKill(global string) (error){
 
   if len(global) < 2 {
@@ -288,4 +286,4 @@ func ZKill(global string) (error){
     return errors.New("ZKill failed: " + string(result) + "Error message: " + string(errmsg))
   }
   return nil
-}  // end of Kill
+}  // end of ZKill
