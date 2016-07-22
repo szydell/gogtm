@@ -6,7 +6,6 @@ Package gogtm enables connection to gt.m database using C API.
    Licensed under the Apache License, Version 2.0
    https://github.com/szydell/gogtm/blob/master/LICENSE
 
-# Based on
-gtmaccess.ci and _gtmaccess.m based on examples found here:
+# based on
+gtmaccess.ci and _gtmaccess.m are based on examples found here:
 http://tinco.pair.com/bhaskar/gtm/doc/books/pg/UNIX_manual/index.html
-
