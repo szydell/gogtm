@@ -1,20 +1,5 @@
 //Package gogtm enables access to gt.m database
 package gogtm
-/*
-Copyright 2016 Linport IT Solutions Marcin Szydelski
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-limitations under the License.
-*/
 
 /*
 #cgo CFLAGS: -I/opt/fis-gtm/6.3-000A
@@ -27,134 +12,134 @@ limitations under the License.
 #define maxstr 1048576
 
 #ifndef NULL
- #define NULL ((void *) 0)
+#define NULL ((void *) 0)
 #endif
 
-#define CALLGTM(xyz) status = xyz ;        \
-  if (0 != status ) {                \
-    gtm_zstatus( msg, 2048 );            \
-    snprintf(errmsg, 2048, "Failure of %s with error: %s\n", #xyz, msg); \
-    return (int) status; \
-  }
+#define CALLGTM(xyz) status = xyz ;		\
+	if (0 != status ) {				\
+		gtm_zstatus( msg, 2048 );			\
+		snprintf(errmsg, 2048, "Failure of %s with error: %s\n", #xyz, msg); \
+		return (int) status; \
+	}
 
 
 int cip_init(char *errmsg, int maxmsglen) {
-  gtm_char_t msg[maxmsglen], err[maxmsglen];
-  gtm_string_t gtminit_str;
-  ci_name_descriptor gtminit;
-  gtm_status_t status;
+	gtm_char_t msg[maxmsglen], err[maxmsglen];
+	gtm_string_t gtminit_str;
+	ci_name_descriptor gtminit;
+	gtm_status_t status;
 
 
-  gtminit_str.address = "gtminit";
-  gtminit_str.length = sizeof("gtminit")-1;
-  gtminit.rtn_name=gtminit_str;
-  gtminit.handle = NULL;
+	gtminit_str.address = "gtminit";
+	gtminit_str.length = sizeof("gtminit")-1;
+	gtminit.rtn_name=gtminit_str;
+	gtminit.handle = NULL;
 
-  errmsg[0] = '\0';
-  err[0] = '\0';
+	errmsg[0] = '\0';
+	err[0] = '\0';
 
-  CALLGTM (gtm_cip( &gtminit, &err));
+	CALLGTM (gtm_cip( &gtminit, &err));
 
-  if (0 != strlen( err )){
-    snprintf(errmsg, maxmsglen, "cip_init error: [%s]\n", err);
-    return 100;
-  }
- return 0;
-}
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_init error: [%s]\n", err);
+		return 100;
+	}
+	return 0;
+} // end of cip_init
 
 int cip_set(char *s_global, char *s_value, char *errmsg, int maxmsglen) {
-  gtm_char_t err[maxmsglen], msg[maxmsglen];
-  gtm_string_t gtmset_str, p_value;
-  ci_name_descriptor gtmset;
-  gtm_status_t status;
+	gtm_char_t err[maxmsglen], msg[maxmsglen];
+	gtm_string_t gtmset_str, p_value;
+	ci_name_descriptor gtmset;
+	gtm_status_t status;
 
-  gtmset_str.address = "gtmset";
-  gtmset_str.length = sizeof("gtmset")-1;
-  gtmset.rtn_name=gtmset_str;
-  gtmset.handle = NULL;
+	gtmset_str.address = "gtmset";
+	gtmset_str.length = sizeof("gtmset")-1;
+	gtmset.rtn_name=gtmset_str;
+	gtmset.handle = NULL;
 
-  err[0] = '\0';
+	err[0] = '\0';
 
-  p_value.address = ( gtm_char_t *) s_value; p_value.length = strlen(s_value);
-  CALLGTM( gtm_cip( &gtmset, s_global, &p_value, &err));
+	p_value.address = ( gtm_char_t *) s_value; p_value.length = strlen(s_value);
+	CALLGTM( gtm_cip( &gtmset, s_global, &p_value, &err));
 
-  if (0 != strlen( err )){
-    snprintf(errmsg, maxmsglen, "cip_set error: [%s]\n", err);
-    fprintf( stderr, "error set: %s", err);
-    return 100;
-  }
- return 0;
-}
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_set error: [%s]\n", err);
+		fprintf( stderr, "error set: %s", err);
+		return 100;
+	}
+	return 0;
+} // end of cip_set
 
 int cip_get(char *s_global, char *s_opt, char *s_ret, char *errmsg, int maxmsglen, int maxretlen) {
-  gtm_char_t err[maxmsglen], msg[maxmsglen];
-  gtm_string_t gtmget_str, p_opt;
-  ci_name_descriptor gtmget;
-  gtm_status_t status;
+	gtm_char_t err[maxmsglen], msg[maxmsglen];
+	gtm_string_t gtmget_str, p_opt;
+	ci_name_descriptor gtmget;
+	gtm_status_t status;
 
-  gtmget_str.address = "gtmget";
-  gtmget_str.length = sizeof("gtmget")-1;
-  gtmget.rtn_name=gtmget_str;
-  gtmget.handle = NULL;
+	gtmget_str.address = "gtmget";
+	gtmget_str.length = sizeof("gtmget")-1;
+	gtmget.rtn_name=gtmget_str;
+	gtmget.handle = NULL;
 
-  err[0] = '\0';
+	err[0] = '\0';
 
-  p_opt.address = ( gtm_char_t *) s_opt; p_opt.length = strlen(s_opt);
+	p_opt.address = ( gtm_char_t *) s_opt; p_opt.length = strlen(s_opt);
 
-  CALLGTM( gtm_cip( &gtmget, s_global, &p_opt, s_ret, errmsg));
+	CALLGTM( gtm_cip( &gtmget, s_global, &p_opt, s_ret, errmsg));
 
-  if (0 != strlen( errmsg )){
-    snprintf(errmsg, maxmsglen, "cip_get error: [%s]\n", err);
-    fprintf( stderr, "error set: %s", err);
-    return 100;
-  }
- return 0;
+	if (0 != strlen( errmsg )){
+		snprintf(errmsg, maxmsglen, "cip_get error: [%s]\n", err);
+		fprintf( stderr, "error set: %s", err);
+		return 100;
+	}
+	return 0;
 } // end of cip_get
 
 int cip_kill(char *s_global, char *errmsg, int maxmsglen) {
-gtm_char_t err[maxmsglen], msg[maxmsglen];
-gtm_string_t gtmkill_str;
-ci_name_descriptor gtmkill;
-gtm_status_t status;
+	gtm_char_t err[maxmsglen], msg[maxmsglen];
+	gtm_string_t gtmkill_str;
+	ci_name_descriptor gtmkill;
+	gtm_status_t status;
 
-gtmkill_str.address = "gtmkill";
-gtmkill_str.length = sizeof("gtmkill")-1;
-gtmkill.rtn_name=gtmkill_str;
-gtmkill.handle = NULL;
+	gtmkill_str.address = "gtmkill";
+	gtmkill_str.length = sizeof("gtmkill")-1;
+	gtmkill.rtn_name=gtmkill_str;
+	gtmkill.handle = NULL;
 
-err[0] = '\0';
+	err[0] = '\0';
 
-CALLGTM( gtm_cip( &gtmkill, s_global, &err));
+	CALLGTM( gtm_cip( &gtmkill, s_global, &err));
 
-if (0 != strlen( err )){
-snprintf(errmsg, maxmsglen, "cip_kill error: [%s]\n", err);
-fprintf( stderr, "error set: %s", err);
-return 100;
-}
-return 0;
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_kill error: [%s]\n", err);
+		fprintf( stderr, "error set: %s", err);
+		return 100;
+	}
+	return 0;
 } // end of cip_kill
 
 int cip_zkill(char *s_global, char *errmsg, int maxmsglen) {
-gtm_char_t err[maxmsglen], msg[maxmsglen];
-gtm_string_t gtmzkill_str;
-ci_name_descriptor gtmzkill;
-gtm_status_t status;
+	gtm_char_t err[maxmsglen], msg[maxmsglen];
+	gtm_string_t gtmzkill_str;
+	ci_name_descriptor gtmzkill;
+	gtm_status_t status;
 
-gtmzkill_str.address = "gtmzkill";
-gtmzkill_str.length = sizeof("gtmzkill")-1;
-gtmzkill.rtn_name=gtmzkill_str;
-gtmzkill.handle = NULL;
+	gtmzkill_str.address = "gtmzkill";
+	gtmzkill_str.length = sizeof("gtmzkill")-1;
+	gtmzkill.rtn_name=gtmzkill_str;
+	gtmzkill.handle = NULL;
 
-err[0] = '\0';
+	err[0] = '\0';
 
-CALLGTM( gtm_cip( &gtmzkill, s_global, &err));
+	CALLGTM( gtm_cip( &gtmzkill, s_global, &err));
 
-if (0 != strlen( err )){
-snprintf(errmsg, maxmsglen, "cip_zkill error: [%s]\n", err);
-fprintf( stderr, "error set: %s", err);
-return 100;
-}
-return 0;
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_zkill error: [%s]\n", err);
+		fprintf( stderr, "error set: %s", err);
+		return 100;
+	}
+	return 0;
 } // end of cip_zkill
 
 int cip_xecute(char *s_global, char *errmsg, int maxmsglen) {
@@ -199,14 +184,10 @@ const maxretlen = 1048576
 //Sample usage: gogtm.Set("^test","value")
 func Set(global string, val string) (error){
 
-  if len(global) < 2 {
-    return errors.New("Set failed - you must provide a global to set")
+  if len(global) < 1 {
+    return errors.New("Set failed - you must provide glvn")
   }
 
-
-  if ! ((string([]rune(global)[0]) == "^") || (string([]rune(global)[0]) == "$")) {
-    return errors.New("Set failed - you must provide a valid global (^GLOBAL...)")
-  }
 
   _global := C.CString(global)
   _val := C.CString(val)
@@ -225,13 +206,10 @@ func Set(global string, val string) (error){
 
 func Get(global string, opt string) (string, error){
 
-  if len(global) < 2 {
-    return "", errors.New("Get failed - you must provide global to get")
+  if len(global) < 1 {
+    return "", errors.New("Get failed - you must provide glvn")
   }
 
-  if string([]rune(global)[0]) != "^" {
-    return "", errors.New("Set failed - you must provide a valid global (^GLOBAL...)")
-  }
 
   _global := C.CString(global)
   _opt := C.CString(opt)
@@ -280,16 +258,15 @@ func Stop() (error){
   return nil
 } // end of Stop
 
+
+
 //Kill deletes global variable and its descendant nodes
 func Kill(global string) (error){
 
-  if len(global) < 2 {
-    return errors.New("Kill failed - you must provide a global to kill")
+  if len(global) < 1 {
+    return errors.New("Kill failed - you must provide [glvn | (glvn[,...]) | *lname | *lvn ]")
   }
 
-  if string([]rune(global)[0]) != "^" {
-    return errors.New("Kill failed - you must provide a valid global (^GLOBAL...)")
-  }
 
   _global := C.CString(global)
   errmsg := make([]byte, maxmsglen)
@@ -303,15 +280,11 @@ func Kill(global string) (error){
   return nil
 }  // end of Kill
 
-//ZKill deletes global variable without its descendant nodes
+//ZKill deletes global variable and its descendant nodes
 func ZKill(global string) (error){
 
-  if len(global) < 2 {
-    return errors.New("ZKill failed - you must provide a global variable to kill")
-  }
-
-  if string([]rune(global)[0]) != "^" {
-    return errors.New("ZKill failed - you must provide a valid global (^GLOBAL...)")
+  if len(global) < 1 {
+    return errors.New("ZKill failed - you must provide glvn")
   }
 
   _global := C.CString(global)
@@ -326,11 +299,12 @@ func ZKill(global string) (error){
   return nil
 }  // end of ZKill
 
+
 //Xecute runs the M code
 func Xecute(code string) (error){
 
   if len(code) < 1 {
-    return errors.New("Xecute failed - you must mode code")
+    return errors.New("Xecute failed - you must provide some code")
   }
 
   _code := C.CString(code)
