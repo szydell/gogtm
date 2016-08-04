@@ -156,6 +156,29 @@ return 100;
 }
 return 0;
 } // end of cip_zkill
+
+int cip_xecute(char *s_global, char *errmsg, int maxmsglen) {
+	gtm_char_t err[maxmsglen], msg[maxmsglen];
+	gtm_string_t gtmxecute_str;
+	ci_name_descriptor gtmxecute;
+	gtm_status_t status;
+
+	gtmxecute_str.address = "gtmxecute";
+	gtmxecute_str.length = sizeof("gtmxecute")-1;
+	gtmxecute.rtn_name=gtmxecute_str;
+	gtmxecute.handle = NULL;
+
+	err[0] = '\0';
+
+	CALLGTM( gtm_cip( &gtmxecute, s_global, &err));
+
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_xecute error: [%s]\n", err);
+		fprintf( stderr, "error set: %s", err);
+		return 100;
+	}
+	return 0;
+} // end of cip_xecute
 */
 import "C"
 
@@ -302,3 +325,22 @@ func ZKill(global string) (error){
   }
   return nil
 }  // end of ZKill
+
+//Xecute runs the M code
+func Xecute(code string) (error){
+
+  if len(code) < 1 {
+    return errors.New("Xecute failed - you must mode code")
+  }
+
+  _code := C.CString(code)
+  errmsg := make([]byte, maxmsglen)
+  defer C.free(unsafe.Pointer(_code))
+
+  result := C.cip_xecute(_code, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
+
+  if result != 0 {
+    return errors.New("Xecute failed: " + string(result) + "Error message: " + string(errmsg))
+  }
+  return nil
+}  // end of Xecute
