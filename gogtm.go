@@ -165,28 +165,29 @@ int cip_xecute(char *s_global, char *errmsg, int maxmsglen) {
 	return 0;
 } // end of cip_xecute
 
-int cip_order(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxretlen) {
-	gtm_char_t err[maxmsglen], msg[maxmsglen];
-	gtm_string_t gtmorder_str, p_opt;
-	ci_name_descriptor gtmorder;
-	gtm_status_t status;
+int cip_order(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxretlen, char *direction) {
+        gtm_char_t err[maxmsglen], msg[maxmsglen];
+        gtm_string_t gtmorder_str, p_opt;
+        ci_name_descriptor gtmorder;
+        gtm_status_t status;
 
-	gtmorder_str.address = "gtmorder";
-	gtmorder_str.length = sizeof("gtmorder")-1;
-	gtmorder.rtn_name=gtmorder_str;
-	gtmorder.handle = NULL;
+        gtmorder_str.address = "gtmorder";
+        gtmorder_str.length = sizeof("gtmorder")-1;
+        gtmorder.rtn_name=gtmorder_str;
+        gtmorder.handle = NULL;
 
-	err[0] = '\0';
+        err[0] = '\0';
 
-	CALLGTM( gtm_cip( &gtmorder, s_global, s_ret, &err));
+        CALLGTM( gtm_cip( &gtmorder, s_global, direction, s_ret, &err));
 
-	if (0 != strlen( err )){
-		snprintf(errmsg, maxmsglen, "cip_order error: [%s]\n", err);
-		fprintf( stderr, "error set: %s", err);
-		return 100;
-	}
-	return 0;
+        if (0 != strlen( err )){
+                snprintf(errmsg, maxmsglen, "cip_order error: [%s]\n", err);
+                fprintf( stderr, "error set: %s", err);
+                return 100;
+        }
+        return 0;
 } // end of cip_order
+
 
 */
 import "C"
@@ -344,25 +345,27 @@ func Xecute(code string) (error){
   return nil
 }  // end of Xecute
 
+func Order(global string, dir string) (string, error){
 
-func Order(global string) (string, error){
+  if len(global) < 1 {
+    return "", errors.New("Order failed - you must provide glvn")
+  }
+	
+  if dir != "-1" {
+    dir = "1"
+  }
 
-	if len(global) < 1 {
-	    return "", errors.New("Get failed - you must provide glvn")
-	}
+  _global := C.CString(global)
+  _dir := C.CString(dir)
+  _ret := make([]byte, maxretlen)
+  errmsg := make([]byte, maxmsglen)
+  defer C.free(unsafe.Pointer(_global))
+  defer C.free(unsafe.Pointer(_dir)) 
+	
+  result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen, _dir)
 
-	_global := C.CString(global)
-	_ret := make([]byte, maxretlen)
-	errmsg := make([]byte, maxmsglen)
-	defer C.free(unsafe.Pointer(_global))
-
-	p := C.malloc(C.size_t(maxmsglen))
-	defer C.free(p)
-
-	result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
-
-	if result != 0 {
-		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
-	}
-	return string(_ret), nil
+  if result != 0 {
+    return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
+  }
+  return string(_ret), nil
 } //end of Order
