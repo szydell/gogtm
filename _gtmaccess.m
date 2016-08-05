@@ -25,12 +25,8 @@ xecute(var,error)
     xecute var
     quit:$quit 0 quit
     ;
-order(var,value,error)
-    set value=$order(@var)
-    quit:$quit 0 quit
-    ;
-revorder(var,value,error)
-    set value=$order(@var,-1)
+order(var,dir,value,error)
+    set value=$order(@var,dir) 
     quit:$quit 0 quit
     ;
 query(var,value,error)
