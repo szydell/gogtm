@@ -193,6 +193,7 @@ int cip_order(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxr
 import "C"
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"unsafe"
@@ -255,6 +256,7 @@ func Get(global string, opt string) (string, error) {
 	if result != 0 {
 		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
 	}
+	_ret = bytes.Trim(_ret, "\x00") // trim unused space
 	return string(_ret), nil
 } //end of Get
 
@@ -368,7 +370,7 @@ func Order(global string, dir string) (string, error) {
 	result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen, _dir)
 
 	if result != 0 {
-		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
+		return "", errors.New("Order failed: " + string(result) + "Error message: " + string(errmsg))
 	}
 	return string(_ret), nil
 } //end of Order
