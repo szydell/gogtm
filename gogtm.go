@@ -192,12 +192,12 @@ int cip_order(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxr
 */
 import "C"
 
-
 import (
-  "unsafe"
-  "errors"
-//  "fmt"
-//  "strconv"
+	"errors"
+	"os"
+	"unsafe"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 //maxmsglen maximum length of message from gt.m
@@ -206,166 +206,169 @@ const maxmsglen = 2048
 //maxretlen maximum length of value retrieved from gt.m
 const maxretlen = 1048576
 
+//global variables to store state of the terminal before gt.m init
+var fd uintptr
+var termAtStart *terminal.State
+
 //Set saves value to global in gt.m db
 //Sample usage: gogtm.Set("^test","value")
-func Set(global string, val string) (error){
+func Set(global string, val string) error {
 
-  if len(global) < 1 {
-    return errors.New("Set failed - you must provide glvn")
-  }
+	if len(global) < 1 {
+		return errors.New("Set failed - you must provide glvn")
+	}
 
+	_global := C.CString(global)
+	_val := C.CString(val)
+	errmsg := make([]byte, maxmsglen)
 
-  _global := C.CString(global)
-  _val := C.CString(val)
-  errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
+	defer C.free(unsafe.Pointer(_val))
 
-  defer C.free(unsafe.Pointer(_global))
-  defer C.free(unsafe.Pointer(_val))
+	result := C.cip_set(_global, _val, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
 
-  result := C.cip_set(_global, _val, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
+	if result != 0 {
+		return errors.New("Set failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return nil
+} // end of Set
 
-  if result != 0 {
-    return errors.New("Set failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return nil
-}  // end of Set
+//Get the value of provided glvn
+func Get(global string, opt string) (string, error) {
 
-func Get(global string, opt string) (string, error){
+	if len(global) < 1 {
+		return "", errors.New("Get failed - you must provide glvn")
+	}
 
-  if len(global) < 1 {
-    return "", errors.New("Get failed - you must provide glvn")
-  }
+	_global := C.CString(global)
+	_opt := C.CString(opt)
+	_ret := make([]byte, maxretlen)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
+	defer C.free(unsafe.Pointer(_opt))
 
+	p := C.malloc(C.size_t(maxmsglen))
+	defer C.free(p)
 
-  _global := C.CString(global)
-  _opt := C.CString(opt)
-  _ret := make([]byte, maxretlen)
-  errmsg := make([]byte, maxmsglen)
-  defer C.free(unsafe.Pointer(_global))
-  defer C.free(unsafe.Pointer(_opt))
+	result := C.cip_get(_global, _opt, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
 
-  p := C.malloc(C.size_t(maxmsglen))
-  defer C.free(p)
-
-  result := C.cip_get(_global, _opt, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
-
-  if result != 0 {
-    return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return string(_ret), nil
+	if result != 0 {
+		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return string(_ret), nil
 } //end of Get
 
+//Start should be used as the initiator of connection to gt.m
+func Start() error {
+	fd = os.Stdin.Fd()
+	termAtStart, _ = terminal.GetState(int(fd))
+	{
+		result := C.gtm_init()
+		if result != 0 {
+			return errors.New("gtm_init failed: " + string(result))
+		}
+	}
+	errmsg := C.CString("")
+	defer C.free(unsafe.Pointer(errmsg))
 
-
-func Start() (error) {
-  {
-  result := C.gtm_init()
-  if result != 0 {
-    return errors.New("gtm_init failed: " + string(result))
-  }
-  }
-  errmsg := C.CString("")
-  defer C.free(unsafe.Pointer(errmsg))
-
-  result := C.cip_init(errmsg, maxmsglen)
-  if result != 0 {
-    return errors.New("CIP Init failed: " + string(result) + "Error MSG: " + C.GoString(errmsg))
-  }
-  return nil
+	result := C.cip_init(errmsg, maxmsglen)
+	if result != 0 {
+		return errors.New("CIP Init failed: " + string(result) + "Error MSG: " + C.GoString(errmsg))
+	}
+	return nil
 } // end of Start
 
-func Stop() (error){
+//Stop closes the connection gently.
+func Stop() error {
 
-  result := C.gtm_exit()
+	result := C.gtm_exit()
 
-  if result != 0 {
-    return errors.New("gtm_exit failed: " + string(result))
-  }
-  return nil
+	if result != 0 {
+		return errors.New("gtm_exit failed: " + string(result))
+	}
+	terminal.Restore(int(fd), termAtStart)
+	return nil
 } // end of Stop
 
-
-
 //Kill deletes global variable and its descendant nodes
-func Kill(global string) (error){
+func Kill(global string) error {
 
-  if len(global) < 1 {
-    return errors.New("Kill failed - you must provide [glvn | (glvn[,...]) | *lname | *lvn ]")
-  }
+	if len(global) < 1 {
+		return errors.New("Kill failed - you must provide [glvn | (glvn[,...]) | *lname | *lvn ]")
+	}
 
+	_global := C.CString(global)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
 
-  _global := C.CString(global)
-  errmsg := make([]byte, maxmsglen)
-  defer C.free(unsafe.Pointer(_global))
+	result := C.cip_kill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
 
-  result := C.cip_kill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
-
-  if result != 0 {
-    return errors.New("Kill failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return nil
-}  // end of Kill
+	if result != 0 {
+		return errors.New("Kill failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return nil
+} // end of Kill
 
 //ZKill deletes global variable and its descendant nodes
-func ZKill(global string) (error){
+func ZKill(global string) error {
 
-  if len(global) < 1 {
-    return errors.New("ZKill failed - you must provide glvn")
-  }
+	if len(global) < 1 {
+		return errors.New("ZKill failed - you must provide glvn")
+	}
 
-  _global := C.CString(global)
-  errmsg := make([]byte, maxmsglen)
-  defer C.free(unsafe.Pointer(_global))
+	_global := C.CString(global)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
 
-  result := C.cip_zkill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
+	result := C.cip_zkill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
 
-  if result != 0 {
-    return errors.New("ZKill failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return nil
-}  // end of ZKill
-
+	if result != 0 {
+		return errors.New("ZKill failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return nil
+} // end of ZKill
 
 //Xecute runs the M code
-func Xecute(code string) (error){
+func Xecute(code string) error {
 
-  if len(code) < 1 {
-    return errors.New("Xecute failed - you must provide some code")
-  }
+	if len(code) < 1 {
+		return errors.New("Xecute failed - you must provide some code")
+	}
 
-  _code := C.CString(code)
-  errmsg := make([]byte, maxmsglen)
-  defer C.free(unsafe.Pointer(_code))
+	_code := C.CString(code)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_code))
 
-  result := C.cip_xecute(_code, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
+	result := C.cip_xecute(_code, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
 
-  if result != 0 {
-    return errors.New("Xecute failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return nil
-}  // end of Xecute
+	if result != 0 {
+		return errors.New("Xecute failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return nil
+} // end of Xecute
 
-func Order(global string, dir string) (string, error){
+//Order returns the next key or glvn
+func Order(global string, dir string) (string, error) {
 
-  if len(global) < 1 {
-    return "", errors.New("Order failed - you must provide glvn")
-  }
-	
-  if dir != "-1" {
-    dir = "1"
-  }
+	if len(global) < 1 {
+		return "", errors.New("Order failed - you must provide glvn")
+	}
 
-  _global := C.CString(global)
-  _dir := C.CString(dir)
-  _ret := make([]byte, maxretlen)
-  errmsg := make([]byte, maxmsglen)
-  defer C.free(unsafe.Pointer(_global))
-  defer C.free(unsafe.Pointer(_dir)) 
-	
-  result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen, _dir)
+	if dir != "-1" {
+		dir = "1"
+	}
 
-  if result != 0 {
-    return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
-  }
-  return string(_ret), nil
+	_global := C.CString(global)
+	_dir := C.CString(dir)
+	_ret := make([]byte, maxretlen)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
+	defer C.free(unsafe.Pointer(_dir))
+
+	result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen, _dir)
+
+	if result != 0 {
+		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	return string(_ret), nil
 } //end of Order
