@@ -212,7 +212,7 @@ const maxretlen = 1048576
 var fd uintptr
 var termAtStart *terminal.State
 
-//global mutex to avoid parallel acces to database (which is unsupported by gt.m)
+//global mutex to avoid parallel acces to database (which is unsupported by used C API from gt.m)
 var mu = &sync.Mutex{}
 
 //Set saves value to global in gt.m db
@@ -238,7 +238,9 @@ func Set(global string, val string) error {
 	return nil
 } // end of Set
 
-//Get the value of provided glvn
+//Get returns the value of provided glvn if it has a value.
+//If the variable has no value, the function returns a value specified by an optional second argument, and otherwise returns an empty string.
+//Sample usage: gogtm.Get("test","nil")
 func Get(global string, opt string) (string, error) {
 
 	if len(global) < 1 {
