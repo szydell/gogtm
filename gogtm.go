@@ -196,6 +196,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"sync"
 	"unsafe"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -211,6 +212,9 @@ const maxretlen = 1048576
 var fd uintptr
 var termAtStart *terminal.State
 
+//global mutex to avoid parallel acces to database (which is unsupported by gt.m)
+var mu = &sync.Mutex{}
+
 //Set saves value to global in gt.m db
 //Sample usage: gogtm.Set("^test","value")
 func Set(global string, val string) error {
@@ -225,9 +229,9 @@ func Set(global string, val string) error {
 
 	defer C.free(unsafe.Pointer(_global))
 	defer C.free(unsafe.Pointer(_val))
-
+	mu.Lock()
 	result := C.cip_set(_global, _val, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
-
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("Set failed: " + string(result) + "Error message: " + string(errmsg))
 	}
@@ -250,8 +254,9 @@ func Get(global string, opt string) (string, error) {
 
 	p := C.malloc(C.size_t(maxmsglen))
 	defer C.free(p)
-
+	mu.Lock()
 	result := C.cip_get(_global, _opt, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
+	mu.Unlock()
 
 	if result != 0 {
 		return "", errors.New("Get failed: " + string(result) + "Error message: " + string(errmsg))
@@ -272,8 +277,9 @@ func Start() error {
 	}
 	errmsg := C.CString("")
 	defer C.free(unsafe.Pointer(errmsg))
-
+	mu.Lock()
 	result := C.cip_init(errmsg, maxmsglen)
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("CIP Init failed: " + string(result) + "Error MSG: " + C.GoString(errmsg))
 	}
@@ -283,8 +289,9 @@ func Start() error {
 //Stop closes the connection gently.
 func Stop() error {
 
+	mu.Lock()
 	result := C.gtm_exit()
-
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("gtm_exit failed: " + string(result))
 	}
@@ -302,9 +309,9 @@ func Kill(global string) error {
 	_global := C.CString(global)
 	errmsg := make([]byte, maxmsglen)
 	defer C.free(unsafe.Pointer(_global))
-
+	mu.Lock()
 	result := C.cip_kill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
-
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("Kill failed: " + string(result) + "Error message: " + string(errmsg))
 	}
@@ -321,9 +328,9 @@ func ZKill(global string) error {
 	_global := C.CString(global)
 	errmsg := make([]byte, maxmsglen)
 	defer C.free(unsafe.Pointer(_global))
-
+	mu.Lock()
 	result := C.cip_zkill(_global, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
-
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("ZKill failed: " + string(result) + "Error message: " + string(errmsg))
 	}
@@ -340,9 +347,9 @@ func Xecute(code string) error {
 	_code := C.CString(code)
 	errmsg := make([]byte, maxmsglen)
 	defer C.free(unsafe.Pointer(_code))
-
+	mu.Lock()
 	result := C.cip_xecute(_code, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)))
-
+	mu.Unlock()
 	if result != 0 {
 		return errors.New("Xecute failed: " + string(result) + "Error message: " + string(errmsg))
 	}
@@ -366,9 +373,9 @@ func Order(global string, dir string) (string, error) {
 	errmsg := make([]byte, maxmsglen)
 	defer C.free(unsafe.Pointer(_global))
 	defer C.free(unsafe.Pointer(_dir))
-
+	mu.Lock()
 	result := C.cip_order(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen, _dir)
-
+	mu.Unlock()
 	if result != 0 {
 		return "", errors.New("Order failed: " + string(result) + "Error message: " + string(errmsg))
 	}
