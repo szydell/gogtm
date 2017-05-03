@@ -1,3 +1,4 @@
+[![GoDoc](https://godoc.org/github.com/szydell/gogtm?status.svg)](https://godoc.org/github.com/szydell/gogtm)
 # gogtm
 
 Package gogtm enables connection to gt.m database using C API.
