@@ -21,8 +21,8 @@ zkill(var,error)
     zkill @var
     quit:$quit 0 quit
     ;
-xecute(var,error)
-    xecute var
+xecute(code,value,error)
+    xecute code
     quit:$quit 0 quit
     ;
 order(var,dir,value,error)
@@ -37,3 +37,8 @@ lock(var,error)
     lock @var
     quit:$quit 0 quit
     ;
+gvstat(stats)
+    N RET 
+    S REGION=$V("GVFIRST") S RET=REGION_"->"_$V("GVSTAT",REGION)
+    F I=1:1 S REGION=$V("GVNEXT",REGION) Q:REGION=""  S RET=RET_"|"_REGION_"->"_$V("GVSTAT",REGION)
+    stats=RET
