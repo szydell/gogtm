@@ -37,7 +37,7 @@ lock(var,error)
     lock @var
     quit:$quit 0 quit
     ;
-gvstat(stats)
+gvstat(stats,error)
     N RET 
     S REGION=$V("GVFIRST") S RET=REGION_"->"_$V("GVSTAT",REGION)
     F I=1:1 S REGION=$V("GVNEXT",REGION) Q:REGION=""  S RET=RET_"|"_REGION_"->"_$V("GVSTAT",REGION)

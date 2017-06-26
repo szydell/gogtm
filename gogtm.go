@@ -104,7 +104,7 @@ int cip_gvstat(char *errmsg, char *s_ret, int maxmsglen) {
 	gtm_status_t status;
 
 
-	gtmgvstat_str.address = "gtmgvstat";
+	gtmgvstat_str.address = "gvstat";
 	gtmgvstat_str.length = sizeof("gtmgvstat")-1;
 	gtmgvstat.rtn_name=gtmgvstat_str;
 	gtmgvstat.handle = NULL;
@@ -302,7 +302,8 @@ func GvStat() (string, error) {
 	p := C.malloc(C.size_t(maxmsglen))
 	defer C.free(p)
 	mu.Lock()
-	result := C.cip_gvstat((*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), maxretlen)
+
+	result := C.cip_gvstat((*C.char)(unsafe.Pointer(&errmsg[0])), (*C.char)(unsafe.Pointer(&_ret[0])), maxretlen)
 	mu.Unlock()
 
 	if result != 0 {
