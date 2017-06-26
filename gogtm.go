@@ -1,4 +1,5 @@
 //Package gogtm enables access to gt.m database
+//single thread only! Do no ty to goroutine this!
 package gogtm
 
 /*
@@ -95,6 +96,30 @@ int cip_get(char *s_global, char *s_opt, char *s_ret, char *errmsg, int maxmsgle
 	}
 	return 0;
 } // end of cip_get
+
+int cip_gvstat(char *errmsg, char *s_ret, int maxmsglen) {
+	gtm_char_t msg[maxmsglen], err[maxmsglen];
+	gtm_string_t gtmgvstat_str;
+	ci_name_descriptor gtmgvstat;
+	gtm_status_t status;
+
+
+	gtmgvstat_str.address = "gtmgvstat";
+	gtmgvstat_str.length = sizeof("gtmgvstat")-1;
+	gtmgvstat.rtn_name=gtmgvstat_str;
+	gtmgvstat.handle = NULL;
+
+	errmsg[0] = '\0';
+	err[0] = '\0';
+
+	CALLGTM (gtm_cip( &gtmgvstat, s_ret, &err));
+
+	if (0 != strlen( err )){
+		snprintf(errmsg, maxmsglen, "cip_gvstat error: [%s]\n", err);
+		return 100;
+	}
+	return 0;
+} // end of cip_gvstat
 
 int cip_kill(char *s_global, char *errmsg, int maxmsglen) {
 	gtm_char_t err[maxmsglen], msg[maxmsglen];
@@ -266,6 +291,26 @@ func Get(global string, opt string) (string, error) {
 	_ret = bytes.Trim(_ret, "\x00") // trim unused space
 	return string(_ret), nil
 } //end of Get
+
+//GvStat returns gvstat for all regions
+//Sample usage: gogtm.GvStat()
+func GvStat() (string, error) {
+
+	_ret := make([]byte, maxretlen)
+	errmsg := make([]byte, maxmsglen)
+
+	p := C.malloc(C.size_t(maxmsglen))
+	defer C.free(p)
+	mu.Lock()
+	result := C.cip_gvstat((*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), maxretlen)
+	mu.Unlock()
+
+	if result != 0 {
+		return "", errors.New("Gvstat failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+	_ret = bytes.Trim(_ret, "\x00") // trim unused space
+	return string(_ret), nil
+} //end of Gvstat
 
 //Start should be used as the initiator of connection to gt.m
 func Start() error {
