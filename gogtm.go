@@ -1,5 +1,5 @@
 //Package gogtm enables access to gt.m database
-//single thread only! Do no ty to goroutine this!
+//single thread only!
 package gogtm
 
 /*
