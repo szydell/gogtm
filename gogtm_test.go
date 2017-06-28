@@ -1,13 +1,14 @@
 package gogtm_test
 
 import (
-  "gogtm"
-  "fmt"
+	"fmt"
+
+	"github.com/szydell/gogtm"
 )
 
 func ExampleSet() {
-  err := gogtm.Set("^test","aaa")
-  if err != nil {
-    fmt.Println("gogtm.Set failed: ", err.Error())
-  }
+	err := gogtm.Set("^test", "aaa")
+	if err != nil {
+		fmt.Println("gogtm.Set failed: ", err.Error())
+	}
 }
