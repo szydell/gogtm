@@ -1,5 +1,4 @@
 //Package gogtm enables access to gt.m database
-//single thread only!
 package gogtm
 
 /*
@@ -224,6 +223,8 @@ import (
 	"sync"
 	"unsafe"
 
+	uuid "github.com/satori/go.uuid"
+
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -239,6 +240,12 @@ var termAtStart *terminal.State
 
 //global mutex to avoid parallel acces to database (which is unsupported by used C API from gt.m)
 var mu = &sync.Mutex{}
+
+// generate goSessionId for multiple purposes
+var goSessionID = uuid.NewV4().String()
+
+// root working directory location
+const workDir = "/tmp"
 
 //Set saves value to global in gt.m db
 //Sample usage: gogtm.Set("^test","value")
@@ -315,6 +322,9 @@ func GvStat() (string, error) {
 
 //Start should be used as the initiator of connection to gt.m
 func Start() error {
+
+	createRoutines(workDir)
+
 	fd = os.Stdin.Fd()
 	termAtStart, _ = terminal.GetState(int(fd))
 	{
@@ -343,6 +353,7 @@ func Stop() error {
 	if result != 0 {
 		return errors.New("gtm_exit failed: " + string(result))
 	}
+	cleanRoutines(workDir)
 	terminal.Restore(int(fd), termAtStart)
 	return nil
 } // end of Stop
