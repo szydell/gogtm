@@ -6,13 +6,6 @@ import (
 	"github.com/szydell/gogtm"
 )
 
-func ExampleSet() {
-	err := gogtm.Set("^test", "aaa")
-	if err != nil {
-		fmt.Println("gogtm.Set failed: ", err.Error())
-	}
-}
-
 func ExampleGet() {
 	data, err := gogtm.Get("^test", "ababababababababa")
 	if err != nil {
@@ -42,4 +35,18 @@ func ExampleOrder() {
 		fmt.Println("gogtm.Order with the reverse direction flag failed", err.Error())
 	}
 	fmt.Sprintf("gogtm.Order returned %s, in the reverse direction returned %s", data, rev)
+}
+
+func ExampleSet() {
+	err := gogtm.Set("^test", "aaa")
+	if err != nil {
+		fmt.Println("gogtm.Set failed: ", err.Error())
+	}
+}
+
+func ExampleZKill() {
+	err := gogtm.ZKill("^test")
+	if err != nil {
+		fmt.Println("gogtm.ZKill failed: ", err.Error())
+	}
 }

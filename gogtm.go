@@ -223,7 +223,7 @@ import (
 	"sync"
 	"unsafe"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -416,6 +416,7 @@ func Xecute(code string) error {
 } // end of Xecute
 
 //Order returns the next key or glvn
+//You can also provide flag '-1' in dir variable. This way order will return previous key or glvn.
 func Order(global string, dir string) (string, error) {
 
 	if len(global) < 1 {
