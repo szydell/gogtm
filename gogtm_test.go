@@ -24,3 +24,10 @@ func ExampleGet() {
 		fmt.Println("Value of global ^test is: " + data)
 	}
 }
+
+func ExampleKill() {
+	err := gogtm.Kill("^test")
+	if err != nil {
+		fmt.Println("gogtm.Kill failed: ", err.Error())
+	}
+}
