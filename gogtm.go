@@ -238,7 +238,7 @@ const maxretlen = 1048576
 var fd uintptr
 var termAtStart *terminal.State
 
-//global mutex to avoid parallel acces to database (which is unsupported by used C API from gt.m)
+//global mutex to avoid parallel access to database (which is unsupported by used C API from gt.m)
 var mu = &sync.Mutex{}
 
 // generate goSessionId for multiple purposes
@@ -377,7 +377,7 @@ func Kill(global string) error {
 	return nil
 } // end of Kill
 
-//ZKill deletes global variable and its descendant nodes
+//ZKill deletes the data value for a variable name without affecting the nodes descended from that node.
 func ZKill(global string) error {
 
 	if len(global) < 1 {
