@@ -31,3 +31,15 @@ func ExampleKill() {
 		fmt.Println("gogtm.Kill failed: ", err.Error())
 	}
 }
+
+func ExampleOrder() {
+	data, err := gogtm.Order("^test", "")
+	if err != nil {
+		fmt.Println("gogtm.Order failed", err.Error())
+	}
+	rev, err := gogtm.Order("^test", "-1")
+	if err != nil {
+		fmt.Println("gogtm.Order with the reverse direction flag failed", err.Error())
+	}
+	fmt.Sprintf("gogtm.Order returned %s, in the reverse direction returned %s", data, rev)
+}
