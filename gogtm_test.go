@@ -37,6 +37,14 @@ func ExampleOrder() {
 	fmt.Sprintf("gogtm.Order returned %s, in the reverse direction returned %s", data, rev)
 }
 
+func ExampleQuery() {
+	data, err := gogtm.Query("^test")
+	if err != nil {
+		fmt.Println("gogtm.Queryfailed", err.Error())
+	}
+	fmt.Sprintf("gogtm.Query returned %s.", data)
+}
+
 func ExampleSet() {
 	err := gogtm.Set("^test", "aaa")
 	if err != nil {

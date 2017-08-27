@@ -62,7 +62,7 @@ gtmzkill  : void zkill^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
 gtmorder  : void order^%gtmaccess( I:gtm_char_t*, I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
 gtmxecute : void xecute^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
 gtmlock   : void lock^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
-gtmquery  : void query^%gtmaccess( I:gtm_char_t*, O:gtm_string_t*, O:gtm_char_t* )
+gtmquery  : void query^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
 gvstat    : void gvstat^%gtmaccess( O:gtm_char_t*, O:gtm_char_t* )
 `)
 

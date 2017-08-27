@@ -213,6 +213,30 @@ int cip_order(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxr
 } // end of cip_order
 
 
+int cip_query(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxretlen) {
+        gtm_char_t err[maxmsglen], msg[maxmsglen];
+        gtm_string_t gtmquery_str, p_opt;
+        ci_name_descriptor gtmquery;
+        gtm_status_t status;
+
+        gtmquery_str.address = "gtmquery";
+        gtmquery_str.length = sizeof("gtmquery")-1;
+        gtmquery.rtn_name=gtmquery_str;
+        gtmquery.handle = NULL;
+
+        err[0] = '\0';
+
+        CALLGTM( gtm_cip( &gtmquery, s_global, s_ret, &err));
+
+        if (0 != strlen( err )){
+                snprintf(errmsg, maxmsglen, "cip_query error: [%s]\n", err);
+                fprintf( stderr, "error set: %s", err);
+                return 100;
+        }
+        return 0;
+} // end of cip_query
+
+
 */
 import "C"
 
@@ -441,3 +465,23 @@ func Order(global string, dir string) (string, error) {
 	}
 	return string(_ret), nil
 } //end of Order
+
+func Query(global string) (string, error) {
+
+	if len(global) < 1 {
+		return "", errors.New("Query failed - you must provide glvn")
+	}
+
+	_global := C.CString(global)
+	_ret := make([]byte, maxretlen)
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
+	mu.Lock()
+	result := C.cip_query(_global, (*C.char)(unsafe.Pointer(&_ret[0])), (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
+	mu.Unlock()
+	if result != 0 {
+		return "", errors.New("Query failed: " + string(result) + "Error message: " + string(errmsg))
+	}
+
+	return string(_ret), nil
+} //end of Query
