@@ -465,7 +465,8 @@ func Order(global string, dir string) (string, error) {
 	}
 	return string(_ret), nil
 } //end of Order
-
+//Query returns the next subscripted local or global variable node name, independent of level, which follows
+//the node specified by its argument in M collating sequence and has a data value.
 func Query(global string) (string, error) {
 
 	if len(global) < 1 {
