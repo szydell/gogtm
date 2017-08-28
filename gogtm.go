@@ -513,11 +513,11 @@ func Query(global string) (string, error) {
 } //end of Query
 
 //Data returns an integer code describing the value and descendent status of a local or global variable.
-// - If the variable is undefined Data returns false, false, nil.
-// - If the variable has a value but no descendants returns true, false, nil
-// - If the variable has descendants but no value returns false, true, nil
-// - If the variable has a value and descendants returns true, true, nil
-// in case of any error returns false, false, error
+//		- If the variable is undefined Data returns false, false, nil.
+//		- If the variable has a value but no descendants returns true, false, nil
+//		- If the variable has descendants but no value returns false, true, nil
+//		- If the variable has a value and descendants returns true, true, nil
+//		in case of any error returns false, false, error
 func Data(global string) (value, descendent bool, err error) {
 
 	value = false
