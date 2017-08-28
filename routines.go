@@ -55,14 +55,13 @@ func cleanRoutines(workDir string) {
 
 func generateCiFile(path string) {
 	data := []byte(`gtminit   : void init^%gtmaccess( O:gtm_char_t* )
-gtmset    : void set^%gtmaccess( I:gtm_char_t*, I:gtm_string_t*, O:gtm_char_t*)
 gtmget    : void get^%gtmaccess( I:gtm_char_t*, I:gtm_string_t*, O:gtm_char_t*, O:gtm_char_t* )
 gtmkill   : void kill^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
-gtmzkill  : void zkill^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
 gtmorder  : void order^%gtmaccess( I:gtm_char_t*, I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
-gtmxecute : void xecute^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
-gtmlock   : void lock^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
 gtmquery  : void query^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
+gtmset    : void set^%gtmaccess( I:gtm_char_t*, I:gtm_string_t*, O:gtm_char_t*)
+gtmxecute : void xecute^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
+gtmzkill  : void zkill^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
 gvstat    : void gvstat^%gtmaccess( O:gtm_char_t*, O:gtm_char_t* )
 `)
 
@@ -79,24 +78,22 @@ init(error)
     set $ztrap="new tmp set error=$ecode set tmp=$piece($ecode,"","",2) quit:$quit $extract(tmp,2,$length(tmp)) quit"
     quit:$quit 0 quit
     ;
-set(var,value,error)
-    set @var=value
-    quit:$quit 0 quit
-    ;
+data(var,value,error)
+	set value=$data(@var)
+	quit:$quit 0 quit
+	;
 get(var,opt,value,error)
     set value=$GET(@var,opt)
     quit:$quit 0 quit
     ;
+gvstat(stats,error)
+    N RET
+    S REGION=$V("GVFIRST") S RET=REGION_"->"_$V("GVSTAT",REGION)
+    F I=1:1 S REGION=$V("GVNEXT",REGION) Q:REGION=""  S RET=RET_"|"_REGION_"->"_$V("GVSTAT",REGION)
+    set stats=RET
+    ;
 kill(var,error)
     kill @var
-    quit:$quit 0 quit
-    ;
-zkill(var,error)
-    zkill @var
-    quit:$quit 0 quit
-    ;
-xecute(code,value,error)
-    xecute code
     quit:$quit 0 quit
     ;
 order(var,dir,value,error)
@@ -107,15 +104,18 @@ query(var,value,error)
     set value=$query(@var)
     quit:$quit 0 quit
     ;
-lock(var,error)
-    lock @var
+set(var,value,error)
+    set @var=value
     quit:$quit 0 quit
     ;
-gvstat(stats,error)
-    N RET 
-    S REGION=$V("GVFIRST") S RET=REGION_"->"_$V("GVSTAT",REGION)
-    F I=1:1 S REGION=$V("GVNEXT",REGION) Q:REGION=""  S RET=RET_"|"_REGION_"->"_$V("GVSTAT",REGION)
-    set stats=RET
+xecute(code,value,error)
+    xecute code
+    quit:$quit 0 quit
+    ;
+zkill(var,error)
+    zkill @var
+    quit:$quit 0 quit
+    ;
 `)
 	path = filepath.Join(path, "_gtmaccess.m")
 	err := ioutil.WriteFile(path, data, 0400)
