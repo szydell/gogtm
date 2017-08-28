@@ -236,6 +236,29 @@ int cip_query(char *s_global, char *s_ret, char *errmsg, int maxmsglen, int maxr
         return 0;
 } // end of cip_query
 
+int cip_data(char *s_global, unsigned int *i_ret, char *errmsg, int maxmsglen, int maxretlen) {
+        gtm_char_t err[maxmsglen], msg[maxmsglen];
+        gtm_string_t gtmdata_str, p_opt;
+        ci_name_descriptor gtmdata;
+        gtm_status_t status;
+
+        gtmdata_str.address = "gtmdata";
+        gtmdata_str.length = sizeof("gtmdata")-1;
+        gtmdata.rtn_name=gtmdata_str;
+        gtmdata.handle = NULL;
+
+        err[0] = '\0';
+
+        CALLGTM( gtm_cip( &gtmdata, s_global, i_ret, &err));
+
+        if (0 != strlen( err )){
+                snprintf(errmsg, maxmsglen, "cip_data error: [%s]\n", err);
+                fprintf( stderr, "error set: %s", err);
+                return 100;
+        }
+        return 0;
+} // end of cip_data
+
 
 */
 import "C"
@@ -463,8 +486,10 @@ func Order(global string, dir string) (string, error) {
 	if result != 0 {
 		return "", errors.New("Order failed: " + string(result) + "Error message: " + string(errmsg))
 	}
+	_ret = bytes.Trim(_ret, "\x00") // trim unused space
 	return string(_ret), nil
 } //end of Order
+
 //Query returns the next subscripted local or global variable node name, independent of level, which follows
 //the node specified by its argument in M collating sequence and has a data value.
 func Query(global string) (string, error) {
@@ -483,6 +508,48 @@ func Query(global string) (string, error) {
 	if result != 0 {
 		return "", errors.New("Query failed: " + string(result) + "Error message: " + string(errmsg))
 	}
-
+	_ret = bytes.Trim(_ret, "\x00") // trim unused space
 	return string(_ret), nil
+} //end of Query
+
+//Data returns an integer code describing the value and descendent status of a local or global variable.
+// - If the variable is undefined Data returns false, false, nil.
+// - If the variable has a value but no descendants returns true, false, nil
+// - If the variable has descendants but no value returns false, true, nil
+// - If the variable has a value and descendants returns true, true, nil
+// in case of any error returns false, false, error
+func Data(global string) (value, descendent bool, err error) {
+
+	value = false
+	descendent = false
+
+	if len(global) < 1 {
+		return value, descendent, errors.New("Data failed - you must provide glvn")
+	}
+
+	_global := C.CString(global)
+	_ret := C.uint(1000)
+
+	errmsg := make([]byte, maxmsglen)
+	defer C.free(unsafe.Pointer(_global))
+	mu.Lock()
+	status := C.cip_data(_global, &_ret, (*C.char)(unsafe.Pointer(&errmsg[0])), C.int(len(errmsg)), maxretlen)
+	mu.Unlock()
+	if status != 0 {
+		return value, descendent, errors.New("Data failed: " + string(status) + "Error message: " + string(errmsg))
+	}
+
+	switch _ret {
+	case 1:
+		value = true
+	case 10:
+		descendent = true
+	case 11:
+		value = true
+		descendent = true
+	case 1000:
+		err = errors.New("Data failed: no code was returned by gt.m.")
+	}
+
+	return
 } //end of Query

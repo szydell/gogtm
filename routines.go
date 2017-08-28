@@ -55,7 +55,7 @@ func cleanRoutines(workDir string) {
 
 func generateCiFile(path string) {
 	data := []byte(`gtminit   : void init^%gtmaccess( O:gtm_char_t* )
-gtmdata   : void data^%gtmaccess( I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
+gtmdata   : void data^%gtmaccess( I:gtm_char_t*, O:gtm_uint_t*, O:gtm_char_t* )
 gtmget    : void get^%gtmaccess( I:gtm_char_t*, I:gtm_string_t*, O:gtm_char_t*, O:gtm_char_t* )
 gtmkill   : void kill^%gtmaccess( I:gtm_char_t*, O:gtm_char_t* )
 gtmorder  : void order^%gtmaccess( I:gtm_char_t*, I:gtm_char_t*, O:gtm_char_t*, O:gtm_char_t* )
