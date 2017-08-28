@@ -275,11 +275,14 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-//maxmsglen maximum length of message from gt.m
+// maxmsglen maximum length of message from gt.m
 const maxmsglen = 2048
 
-//maxretlen maximum length of value retrieved from gt.m
+// maxretlen maximum length of value retrieved from gt.m
 const maxretlen = 1048576
+
+// root working directory location
+const workDir = "/tmp"
 
 //global variables to store state of the terminal before gt.m init
 var fd uintptr
@@ -290,9 +293,6 @@ var mu = &sync.Mutex{}
 
 // generate goSessionId for multiple purposes
 var goSessionID = uuid.NewV4().String()
-
-// root working directory location
-const workDir = "/tmp"
 
 //Set saves value to global in gt.m db
 //Sample usage: gogtm.Set("^test","value")
