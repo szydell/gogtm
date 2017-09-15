@@ -512,7 +512,7 @@ func Query(global string) (string, error) {
 	return string(_ret), nil
 } //end of Query
 
-//Data returns an integer code describing the value and descendent status of a local or global variable.
+//Data returns an 2 boolean values describing the value and descendent status of a local or global variable.
 //		- If the variable is undefined Data returns false, false, nil.
 //		- If the variable has a value but no descendants returns true, false, nil
 //		- If the variable has descendants but no value returns false, true, nil
@@ -548,8 +548,8 @@ func Data(global string) (value, descendent bool, err error) {
 		value = true
 		descendent = true
 	case 1000:
-		err = errors.New("Data failed: no code was returned by gt.m.")
+		err = errors.New("Data failed: no code was returned by gt.m")
 	}
 
 	return
-} //end of Query
+} //end of Data
