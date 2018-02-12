@@ -91,7 +91,8 @@ gvstat(stats,error)
     N RET
     S REGION=$V("GVFIRST") S RET=REGION_"->"_$V("GVSTAT",REGION)
     F I=1:1 S REGION=$V("GVNEXT",REGION) Q:REGION=""  S RET=RET_"|"_REGION_"->"_$V("GVSTAT",REGION)
-    set stats=RET
+	set stats=RET
+	quit:$quit 0 quit
     ;
 kill(var,error)
     kill @var
