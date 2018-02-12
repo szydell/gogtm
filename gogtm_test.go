@@ -34,7 +34,7 @@ func ExampleOrder() {
 	if err != nil {
 		fmt.Println("gogtm.Order with the reverse direction flag failed", err.Error())
 	}
-	fmt.Sprintf("gogtm.Order returned %s, in the reverse direction returned %s", data, rev)
+	fmt.Printf("gogtm.Order returned %s, in the reverse direction returned %s", data, rev)
 }
 
 func ExampleQuery() {
@@ -42,7 +42,7 @@ func ExampleQuery() {
 	if err != nil {
 		fmt.Println("gogtm.Queryfailed", err.Error())
 	}
-	fmt.Sprintf("gogtm.Query returned %s.", data)
+	fmt.Printf("gogtm.Query returned %s.", data)
 }
 
 func ExampleSet() {

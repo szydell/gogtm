@@ -2,8 +2,8 @@
 package gogtm
 
 /*
-#cgo CFLAGS: -I/opt/fis/6.3-001A
-#cgo LDFLAGS: -L/opt/fis/6.3-001A -lgtmshr
+#cgo CFLAGS: -I/opt/fis-gtm/6.3-001A
+#cgo LDFLAGS: -L/opt/fis-gtm/6.3-001A -lgtmshr
 #include <gtmxc_types.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -292,7 +292,10 @@ var termAtStart *terminal.State
 var mu = &sync.Mutex{}
 
 // generate goSessionId for multiple purposes
-var goSessionID = uuid.NewV4().String()
+var u, err = uuid.NewV4()
+var goSessionID = u.String()
+
+//var goSessionID = uuid.NewV4().String()
 
 //Set saves value to global in gt.m db
 //Sample usage: gogtm.Set("^test","value")
