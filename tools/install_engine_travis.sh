@@ -25,6 +25,14 @@ y
 EOF
 rm -rf /tmp/gtm_install
 # Create symbolic link used for gogtm compilation
-sudo ln -s /opt/fis-gtm/6.3-001A /opt/fis-gtm/engine
-export PATH=/opt/fis-gtm/engine:$PATH
+export gtm_dist=/opt/fis-gtm/engine
+sudo ln -s /opt/fis-gtm/6.3-001A $gtm_dist
+mkdir /tmp/gtm
+export PATH=$gtm_dist:$PATH
+export gtm_chset=UTF-8
+export gtmgbldir=/tmp/gtm.gld
+export gtm_tmp=/tmp/gtm
+alias gde="$gtm_dist/mumps -run GDE"
+$gtm_dist/mumps -run %XCMD 'Write "@","'$gtm_dist'/gdedefaults",!,"exit",!' | $gtm_dist/mumps -run GDE; stty sane
+
 #source /opt/fis-gtm/6.3-001A/gtmprofile
