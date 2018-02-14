@@ -18,7 +18,7 @@ n
 y
 y
 y
-5.0
+5.2
 y
 y
 y
@@ -26,4 +26,5 @@ EOF
 rm -rf /tmp/gtm_install
 # Create symbolic link used for gogtm compilation
 sudo ln -s /opt/fis-gtm/6.3.001A /opt/fis-gtm/engine
-
+ls -al /opt/fis-gtm/
+. /opt/fis-gtm/engine/gtmprofile
