@@ -32,6 +32,7 @@ export PATH=$gtm_dist:$PATH
 export gtm_chset=UTF-8
 export gtmgbldir=/tmp/gtm.gld
 export gtm_tmp=/tmp/gtm
+export gtm_icu_version=5.2
 alias gde="$gtm_dist/mumps -run GDE"
 $gtm_dist/mumps -run %XCMD 'Write "@","'$gtm_dist'/gdedefaults",!,"exit",!' | $gtm_dist/mumps -run GDE; stty sane
 
