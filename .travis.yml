@@ -1,0 +1,2 @@
+before_install:
+  - ./tools/install_engine_travis.sh
