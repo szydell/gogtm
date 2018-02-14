@@ -2,8 +2,8 @@
 package gogtm
 
 /*
-#cgo CFLAGS: -I/opt/fis-gtm/6.3-001A
-#cgo LDFLAGS: -L/opt/fis-gtm/6.3-001A -lgtmshr
+#cgo CFLAGS: -I/opt/fis-gtm/engine
+#cgo LDFLAGS: -L/opt/fis-gtm/engine -lgtmshr
 #include <gtmxc_types.h>
 #include <stdlib.h>
 #include <stdio.h>
