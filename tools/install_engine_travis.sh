@@ -24,3 +24,5 @@ y
 y
 EOF
 rm -rf /tmp/gtm_install
+cp ./tools/gtm.conf /etc/ld.so.conf.d
+sudo ldconfig
