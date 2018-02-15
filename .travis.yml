@@ -15,5 +15,5 @@ before_install:
   - ./tools/install_engine_travis_run.sh
 
 script:
-  - go test
+  - go build
   
