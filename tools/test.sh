@@ -28,12 +28,3 @@ rm -rf /tmp/gtm_install
 export gtm_dist=/opt/fis-gtm/engine
 sudo ln -s /opt/fis-gtm/6.3-001A $gtm_dist
 mkdir -p /tmp/gtm
-export PATH=$gtm_dist:$PATH
-export gtm_chset=UTF-8
-export gtmgbldir=/tmp/gtm.gld
-export gtm_tmp=/tmp/gtm
-export gtm_icu_version=5.0
-alias gde="$gtm_dist/mumps -run GDE"
-export gtmroutines=$gtm_dist/libgtmutil.so
-#$gtm_dist/mumps -run GDE
-#source /opt/fis-gtm/6.3-001A/gtmprofile
