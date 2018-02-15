@@ -4,5 +4,5 @@
 
 env
 
-echo "exit" | $gtm_dist/mumps -run GDE
-$gtm_dist/mupip create
+echo "exit" | "$gtm_dist"/mumps -run GDE
+"$gtm_dist"/mupip create
