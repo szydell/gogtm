@@ -13,4 +13,8 @@ before_install:
   - ./tools/install_engine_travis.sh
   - source ./tools/install_engine_travis_source.sh
   - ./tools/install_engine_travis_run.sh
+
+script:
+  - source ./tools/install_engine_travis_source.sh
+  - test ./...
   
