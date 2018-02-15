@@ -15,6 +15,5 @@ before_install:
   - ./tools/install_engine_travis_run.sh
 
 script:
-  - source ./tools/install_engine_travis_source.sh
-  - go test ./...
+  - env && source ./tools/install_engine_travis_source.sh && go test ./...
   
