@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/szydell/gogtm?status.svg)](https://godoc.org/github.com/szydell/gogtm) [![GoReport](https://goreportcard.com/badge/github.com/szydell/gogtm)](https://goreportcard.com/report/github.com/szydell/gogtm) [![Build Status](https://travis-ci.org/szydell/mstools.svg?branch=master)](https://travis-ci.org/szydell/mstools)
+[![GoDoc](https://godoc.org/github.com/szydell/gogtm?status.svg)](https://godoc.org/github.com/szydell/gogtm) [![GoReport](https://goreportcard.com/badge/github.com/szydell/gogtm)](https://goreportcard.com/report/github.com/szydell/gogtm) [![Build Status](https://travis-ci.org/szydell/gogtm.svg?branch=master)](https://travis-ci.org/szydell/gogtm)
 # gogtm
 
 Package gogtm enables connection to gt.m database using C API.
