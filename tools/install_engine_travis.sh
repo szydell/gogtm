@@ -3,6 +3,8 @@
 # Version for ubuntu and travis
 
 set -ex
+sudo cp ./tools/gtm.conf /etc/ld.so.conf.d
+sudo ldconfig
 sudo rm -rf /tmp/gtm_install
 mkdir /tmp/gtm_install
 cd /tmp/gtm_install
@@ -24,5 +26,3 @@ y
 y
 EOF
 rm -rf /tmp/gtm_install
-cp ./tools/gtm.conf /etc/ld.so.conf.d
-sudo ldconfig
