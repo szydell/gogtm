@@ -40,7 +40,7 @@ func ExampleOrder() {
 func ExampleQuery() {
 	data, err := gogtm.Query("^test")
 	if err != nil {
-		fmt.Println("gogtm.Queryfailed", err.Error())
+		fmt.Println("gogtm.Query failed", err.Error())
 	}
 	fmt.Printf("gogtm.Query returned %s.", data)
 }

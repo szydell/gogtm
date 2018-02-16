@@ -515,7 +515,7 @@ func Query(global string) (string, error) {
 	return string(_ret), nil
 } //end of Query
 
-//Data returns an 2 boolean values describing the value and descendent status of a local or global variable.
+//Data returns 2 boolean values describing the value and descendent status of a local or global variable.
 //		- If the variable is undefined Data returns false, false, nil.
 //		- If the variable has a value but no descendants returns true, false, nil
 //		- If the variable has descendants but no value returns false, true, nil
